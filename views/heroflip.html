@@ -1,0 +1,270 @@
+var jsElm = document.createElement('script');
+	jsElm.type = "application/javascript";
+    jsElm.src = 'https://adserve.2adpro.com/js/viewability.js';
+    
+parent.document.body.appendChild(jsElm);
+
+function setCookie(cname, cvalue, exdays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays*24*60*60*1000));
+    var expires = "expires="+ d.toUTCString();
+    document.cookie = cname + "=" + cvalue + "; " + expires;
+}
+
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length,c.length);
+        }
+    }
+    return "";
+}
+
+var freqCapCnt = getCookie('{{refId}}');
+var displayVideo = '';
+var displaySliveAd = 'none';
+var setFreqCapCnt = '1';
+if(freqCapCnt=='')
+{
+  displayVideo = '';
+  displaySliveAd = 'none';
+}
+else if(freqCapCnt=='1')
+{
+ displayVideo='none';
+ displaySliveAd = '';
+}
+
+iframe = document.createElement('iframe');
+iframe.id = 'frame_{{refId}}';
+iframe.src = "{{creativeUrl}}?refId={{refId}}&clickmacro={{clickmacro}}&lId={{lId}}&cId={{cId}}&oId={{oId}}";
+iframe.setAttribute('style','border:none;width:100%;height:100%;display:');
+iframe.setAttribute('scrolling','no');
+
+closeButton = document.createElement('div');
+closeButton.setAttribute('id','closeBtn');
+closeButton.innerHTML='<img src="https://adserve.2adpro.com/images/closeBtn.png">';
+closeButton.setAttribute('style','position: absolute;right:4px;top:4px;cursor:pointer;z-index:10');
+
+section = document.createElement('section');
+section.appendChild(iframe);
+//section.appendChild(closeButton);
+section.id='creative_disp';
+section.setAttribute('style','width: 840px; height: 540px; z-index:1;position:relative;');
+section.style.display=displayVideo;
+var slides = parent.document.getElementsByClassName('h6upwi-slide');
+if(displayVideo=='none')
+{
+	section.style.transform = 'rotatey(-90deg)';
+}
+else
+{
+	for(k=0;k<slides.length;k++)
+	{
+		slides[k].style.transform = 'rotatex(-90deg)';
+		
+		slides[k].style.display = 'none';
+	}
+}
+
+parent.document.getElementsByClassName('ui-placer')[0].insertBefore(section,parent.document.getElementsByClassName('h6upwi-thumbs')[0]);
+
+slivebck = document.createElement('div');
+slivebck.setAttribute('id','sliverbackgnd');
+slivebck.setAttribute('style','width:100%;padding-top:20px;display:block;clear:both;text-align:center;z-index:10');
+
+slivead = document.createElement('img');
+slivead.id='sliveimg';
+slivead.src='{{sliverImage}}';
+slivead.setAttribute('style','cursor:pointer;');
+if(displaySliveAd=='none'){
+slivead.style.visibility="hidden";
+}
+slivebck.appendChild(slivead);
+
+parent.document.getElementsByClassName('card-container')[0].setAttribute('style','width: 100%; background: transparent url("{{backgroundImage}}") no-repeat scroll 0% 0% / contain; left: 0px; top: 0px; height: 100%; z-index:1;');
+parent.document.getElementsByClassName('card-container')[0].insertBefore(slivebck, parent.document.getElementsByClassName('card-container')[0].firstChild);
+
+parent.document.getElementById(window.frameElement.id).style.display='none';
+
+setCookie('{{refId}}',setFreqCapCnt,1);
+
+var st=0;
+var dt=90;
+var element;
+var degree;
+
+function flip(el, el2, deg){	
+	element =el;
+	degree = deg;
+	
+	if(deg==0){
+		(function fade1() {
+   			st = st+5;
+   			var currDeg = st%(90);
+			if (st==90) {				
+			    	st=0;
+			    	el.style.display='none';
+			    	el2.style.display='';
+			    	flip(el2,el2,90);
+			    	
+    			} else {
+    				el.style.transform = 'rotatex(-'+st+'deg)';
+    				el.style.display='';
+      				parent.window.requestAnimationFrame(fade1);      				
+    			}
+  		})();      	
+   		
+	}else{
+		(function fade2() {
+   			dt = parseInt(dt)-5;
+   			if (dt==0) {				
+			    	dt=90; 
+			    	el.style.transform = 'rotatex(0deg)';
+                                //el.style.display='';	
+    			} else {
+    				el.style.transform = 'rotatex(-'+dt+'deg)';		
+    				el.style.display='';
+      				parent.window.requestAnimationFrame(fade2);				
+    			}
+  		})();
+	}
+}
+
+slivead.onclick = function(){
+        showHideCreative('show');
+}
+
+closeButton.onclick = function(){
+		showHideCreative('hide');
+}
+
+var dir;
+var dt=document.body.scrollTop;
+function showHideCreative(action){
+        if(action=='show')
+        {
+		var xmlhttp = new XMLHttpRequest();
+			    xmlhttp.onreadystatechange = function() {};	
+			    var params = 'refId={{refId}}';
+			    params += '&lineId={{lId}}';
+			    params += '&oId={{oId}}';
+			    params += '&cId={{cId}}';
+			    params += '&event=SHOW';
+	            xmlhttp.open("POST", "https://adserve.2adpro.com/trackuseractivity", true);
+	            xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	            xmlhttp.send(params);
+		
+		st=0; dt=90;
+               flip(slides[0],parent.document.getElementById('creative_disp'),0);
+               parent.document.getElementById('sliveimg').style.visibility='hidden';
+		for(k=0;k<slides.length;k++)
+        	{
+	                slides[k].style.transform = 'rotatex(-90deg)';
+                
+                	slides[k].style.display = 'none';
+        	}
+        }
+        else if(action=='hide')
+        {
+				var xmlhttp = new XMLHttpRequest();
+			    xmlhttp.onreadystatechange = function() {};	
+			    var params = 'refId={{refId}}';
+			    params += '&lineId={{lId}}';
+			    params += '&oId={{oId}}';
+			    params += '&cId={{cId}}';
+			    params += '&event=HIDE';
+	            xmlhttp.open("POST", "https://adserve.2adpro.com/trackuseractivity", true);
+	            xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	            xmlhttp.send(params);
+		
+		st = 0; dt=90;
+               flip(parent.document.getElementById('creative_disp'),slides[0],0);
+               parent.document.getElementById('sliveimg').style.visibility='visible';
+		for(k=0;k<slides.length;k++)
+                {
+                        slides[k].style.transform = 'rotatex(-0deg)';
+                
+                        slides[k].style.display = '';
+                }	
+        }
+};
+
+var threshold = 0.5
+var elapsedTime = 0
+var startOfElapsedTime = -1 // -1 means not started
+var tracked = 0;
+	
+function calculate(el) {
+	var v = parent.viewability.vertical(el)
+	var h = parent.viewability.horizontal(el)
+	var combined = h.value * v.value
+	if (combined > threshold) {
+		if (elapsedTime === 0 && startOfElapsedTime === -1) {
+			startOfElapsedTime = Date.now()
+		}
+		elapsedTime = Date.now() - startOfElapsedTime
+	} else {
+		elapsedTime = 0;
+		startOfElapsedTime = -1 // resets to non-started position
+	}
+	
+	if(elapsedTime>1000 && tracked==0)
+	{
+		tracked = 1;
+		var xmlhttp = new XMLHttpRequest();
+	    xmlhttp.onreadystatechange = function() {};	
+	    var params = 'refId={{refId}}';
+	    params += '&lineId={{lId}}';
+	    params += '&oId={{oId}}';
+	    params += '&cId={{cId}}';
+	    xmlhttp.open("POST", "https://adserve.2adpro.com/trackview", true);
+	    xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	    xmlhttp.send(params);
+	}
+		if(elapsedTime>1000 && tracked==0)
+	{
+		tracked = 1;
+		var xmlhttp = new XMLHttpRequest();
+	    xmlhttp.onreadystatechange = function() {};	
+	    var params = 'refId={{refId}}';
+	    params += '&lineId={{lId}}';
+	    params += '&oId={{oId}}';
+	    params += '&cId={{cId}}';
+	     params += '&event=VIEWED';
+	    xmlhttp.open("POST", "https://adserve.2adpro.com/trackuseractivity", true);
+	    xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	    xmlhttp.send(params);
+	}
+}
+
+function ReceiveMessageAdserve(evt) {
+          if(evt.data == 'show')
+                showHideCreative('show');
+          else if(evt.data == 'hide')
+                showHideCreative('hide');
+         } // End Function ReceiveMessage
+
+
+        if (!window['postMessage'])
+        { }
+         else {
+                if (parent.window.addEventListener) {
+                    // For standards-compliant web browsers (ie9+)
+                    parent.window.addEventListener("message", ReceiveMessageAdserve, false);
+                }
+                else {
+                    //alert("not standards-compliant (ie8)");
+                    parent.window.attachEvent("onmessage", ReceiveMessageAdserve);
+                 }
+        }
+
+parent.window.setTimeout(function(){parent.window.setInterval(function() {
+	calculate(parent.document.getElementById('sliveimg'))
+}, 89);},10000);

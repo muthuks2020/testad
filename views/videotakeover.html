@@ -1,0 +1,268 @@
+var jsElm = document.createElement('script');
+	jsElm.type = "application/javascript";
+    jsElm.src = 'https://adserve.2adpro.com/js/viewability.js';
+    
+parent.document.body.appendChild(jsElm);
+
+function setCookie(cname, cvalue, exdays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays*24*60*60*1000));
+    var expires = "expires="+ d.toUTCString();
+    document.cookie = cname + "=" + cvalue + "; " + expires;
+}
+
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length,c.length);
+        }
+    }
+    return "";
+}
+
+var freqCapCnt = getCookie('{{refId}}');
+var displayVideo = '';
+var displaySliveAd = 'none';
+var setFreqCapCnt = '1';
+if(freqCapCnt=='')
+{
+  displayVideo = '';
+  displaySliveAd = 'none';
+}
+else if(freqCapCnt=='1')
+{
+ displayVideo='none';
+ displaySliveAd = '';
+}
+
+iframe = document.createElement('iframe');
+iframe.id = 'frame_{{refId}}';
+iframe.src = "{{creativeUrl}}?refId={{refId}}&clickmacro={{clickmacro}}&lId={{lId}}&cId={{cId}}&oId={{oId}}&t={{time}}";
+iframe.setAttribute('style','border:none;width:0px;height:0px;display:;left:0px;top:0;bottom:0;right:0;margin:auto; background:transparent;display:none');
+iframe.setAttribute('scrolling','no');
+iframe.setAttribute('allowfullscreen',"true");
+iframe.setAttribute('allowTransparency',"true");
+iframe.setAttribute('webkitallowfullscreen',"true");
+iframe.setAttribute('mozallowfullscreen',"true");
+
+var h = parent.window.innerHeight
+|| parent.document.documentElement.clientHeight
+|| parent.document.body.clientHeight;
+
+icontainer = document.createElement('div');
+icontainer.setAttribute('style','border:none;width:100%;height:80%;display:;z-index:20000;position:fixed;top: 0px; left: 0px; right:0px; bottom:0px; margin:auto;');
+icontainer.appendChild(iframe);
+
+clicktoshow = document.createElement('div');
+clicktoshow.setAttribute('id','clicktoshow');
+clicktoshow.innerHTML = '<img src="{{clickToShowButton}}" style="width:220px;cursor:pointer;" width="220px">';
+clicktoshow.setAttribute('style','position:absolute;top:160px;left:50%;margin-left:-110px;z-index:5;display:none');
+
+section = document.createElement('section');
+section.appendChild(icontainer);
+section.appendChild(clicktoshow);
+section.id='creative_disp';
+section.setAttribute('style','width: 100%; height: 100%; position: relative; top: 0px; left: 0px; bottom:0px; right:0px; margin:auto;z-index:1000000;');
+section.style.display=displayVideo;
+
+bleed = document.createElement('div');
+bleed.setAttribute('style','width:100%;height:100%;background-color:#000;opacity:0.8;z-index:11000;position:fixed;');
+bleed.innerHTML='&nbsp;';
+section.appendChild(bleed);
+
+var w = parent.window.innerWidth
+|| parent.document.documentElement.clientWidth
+|| parent.document.body.clientWidth;
+
+var h = parent.window.innerHeight
+|| parent.document.documentElement.clientHeight
+|| parent.document.body.clientHeight;
+
+//t = parseInt((h/2)-((768-h)*2)-((768-h)/(768-h)));
+//l = parseInt((w/2)-((768-h)*2)-((768-h)/(768-h)));
+
+t = parseInt((h/2)-((h*0.8)/2)+30);
+l = parseInt((w/2)+((h*0.8)/2)+30);
+
+if(t<0) t = 4;
+if(h<700)
+{
+  t = 4;
+  l = l+100;
+}
+closeButton = document.createElement('div');
+closeButton.setAttribute('id','closeBtn');
+closeButton.innerHTML='<img src="https://adserve.2adpro.com/images/closeBtn.png">';
+closeButton.setAttribute('style','position: absolute;left:'+ l +'px; top:'+ t +'px;cursor:pointer;z-index:121300000');
+//icontainer.appendChild(closeButton);
+
+//parent.document.getElementById('main').insertBefore(section,parent.document.getElementById('main-content'));
+//parent.document.body.appendChild(section);
+parent.document.getElementsByClassName('card-container')[0].insertBefore(section,parent.document.getElementsByClassName('card-container')[0].firstChild);
+
+slivebck = document.createElement('div');
+slivebck.setAttribute('id','sliverbackgnd');
+slivebck.setAttribute('style','width:100%;margin-top:20px;display:block;clear:both;text-align:center;position:absolute;z-index:10');
+
+slivead = document.createElement('img');
+slivead.id='sliveimg';
+slivead.src='{{sliverImage}}';
+slivead.setAttribute('style','cursor:pointer;');
+slivebck.appendChild(slivead);
+parent.document.getElementsByClassName('card-container')[0].setAttribute('style','width: 100%; background: transparent url("{{backgroundImage}}") no-repeat scroll 0% 0%; left: 0px; top: 0px; height: 100%;');
+parent.document.getElementsByClassName('card-container')[0].insertBefore(slivebck, parent.document.getElementsByClassName('card-container')[0].firstChild);
+
+if(displayVideo=='')
+{
+	parent.document.getElementsByClassName('site-nav')[0].className = 'site-nav is_stuck';
+	parent.document.getElementsByClassName('site-nav')[0].setAttribute('style','position: fixed; top: 0px; width: 1353px;');
+	parent.document.getElementsByClassName('site-masthead')[0].setAttribute('style','margin-top:-80px');
+        parent.document.body.setAttribute('style','overflow:hidden;height:1380px');
+		
+}
+
+setCookie('{{refId}}',setFreqCapCnt,1);
+slivead.onclick = function(){
+        showHideCreative('show');
+}
+
+function showHideCreative(action){
+        if(action=='show')
+        {
+			     		var xmlhttp = new XMLHttpRequest();
+			    xmlhttp.onreadystatechange = function() {};	
+			    var params = 'refId={{refId}}';
+			    params += '&lineId={{lId}}';
+			    params += '&oId={{oId}}';
+			    params += '&cId={{cId}}';
+			    params += '&event=SHOW';
+	            xmlhttp.open("POST", "https://adserve.2adpro.com/trackuseractivity", true);
+	            xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	            xmlhttp.send(params);
+	            
+                parent.document.getElementById('creative_disp').style.display='';
+                parent.document.getElementById('sliveimg').style.display='none';
+		parent.document.getElementsByClassName('site-nav')[0].className = 'site-nav is_stuck';
+        	parent.document.getElementsByClassName('site-nav')[0].setAttribute('style','position: fixed; top: 0px; width: 1353px;');
+		parent.document.body.setAttribute('style','overflow:hidden;height:1380px');
+		parent.document.getElementsByClassName('site-masthead')[0].setAttribute('style','margin-top:-80px');
+
+		var win = parent.document.getElementById('frame_{{refId}}').contentWindow;
+	        if (win == null || !window['postMessage']){}
+        	else
+                	win.postMessage("restart", "*");
+        }
+        else if(action=='hide')
+        {
+		var xmlhttp = new XMLHttpRequest();
+			    xmlhttp.onreadystatechange = function() {};	
+			    var params = 'refId={{refId}}';
+			    params += '&lineId={{lId}}';
+			    params += '&oId={{oId}}';
+			    params += '&cId={{cId}}';
+			    params += '&event=HIDE';
+	            xmlhttp.open("POST", "https://adserve.2adpro.com/trackuseractivity", true);
+	            xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	            xmlhttp.send(params);
+				
+                parent.document.getElementById('creative_disp').style.display='none';
+                parent.document.getElementById('sliveimg').style.display='';
+		parent.document.getElementsByClassName('site-nav')[0].className = 'site-nav';
+	        parent.document.getElementsByClassName('site-nav')[0].removeAttribute('style');
+		parent.document.body.removeAttribute('style');
+		parent.document.getElementsByClassName('site-masthead')[0].removeAttribute('style');
+		var win = parent.document.getElementById('frame_{{refId}}').contentWindow;
+                if (win == null || !window['postMessage']){}
+                else
+                        win.postMessage("stop", "*");
+        }
+};
+
+closeButton.onclick = function(){
+                showHideCreative('hide');
+}
+
+var threshold = 0.5
+var elapsedTime = 0
+var startOfElapsedTime = -1 // -1 means not started
+var tracked = 0;
+	
+function calculate(el) {
+	var v = parent.viewability.vertical(el)
+	var h = parent.viewability.horizontal(el)
+	var combined = h.value * v.value
+	if (combined > threshold) {
+		if (elapsedTime === 0 && startOfElapsedTime === -1) {
+			startOfElapsedTime = Date.now()
+		}
+		elapsedTime = Date.now() - startOfElapsedTime
+	} else {
+		elapsedTime = 0;
+		startOfElapsedTime = -1 // resets to non-started position
+	}
+	
+	if(elapsedTime>1000 && tracked==0)
+	{
+		tracked = 1;
+		var xmlhttp = new XMLHttpRequest();
+	    xmlhttp.onreadystatechange = function() {};	
+	    var params = 'refId={{refId}}';
+	    params += '&lineId={{lId}}';
+	    params += '&oId={{oId}}';
+	    params += '&cId={{cId}}';
+	    xmlhttp.open("POST", "https://adserve.2adpro.com/trackview", true);
+	    xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	    xmlhttp.send(params);
+	}
+	if(elapsedTime>1000 && tracked==0)
+	{
+		tracked = 1;
+		var xmlhttp = new XMLHttpRequest();
+	    xmlhttp.onreadystatechange = function() {};	
+	    var params = 'refId={{refId}}';
+	    params += '&lineId={{lId}}';
+	    params += '&oId={{oId}}';
+	    params += '&cId={{cId}}';
+	     params += '&event=VIEWED';
+	    xmlhttp.open("POST", "https://adserve.2adpro.com/trackuseractivity", true);
+	    xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	    xmlhttp.send(params);
+	}
+}
+
+function ReceiveMessageAdserve(evt) {
+          if(evt.data == 'show')
+                showHideCreative('show');
+          else if(evt.data == 'hide')
+                showHideCreative('hide');
+         } // End Function ReceiveMessage
+
+
+        if (!window['postMessage'])
+        { }
+         else {
+                if (parent.window.addEventListener) {
+                    // For standards-compliant web browsers (ie9+)
+                    parent.window.addEventListener("message", ReceiveMessageAdserve, false);
+                }
+                else {
+                    //alert("not standards-compliant (ie8)");
+                    parent.window.attachEvent("onmessage", ReceiveMessageAdserve);
+                 }
+        }
+
+parent.window.setTimeout(function(){parent.window.setInterval(function() {
+	calculate(parent.document.getElementById('sliveimg'))
+}, 89);},10000);
+
+parent.window.setTimeout(function(){
+var iframe = parent.document.getElementById('frame_{{refId}}');
+iframe.style.display = '';
+iframe.style.width='100%';
+iframe.style.height='100%';},3000);

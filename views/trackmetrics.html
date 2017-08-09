@@ -1,0 +1,588 @@
+var getUriParams = function() {
+		var query_string = {}
+		var query = window.location.search.substring(1);
+		var parmsArray = query.split('&');
+		if(parmsArray.length <= 0) return query_string;
+		for(var i = 0; i < parmsArray.length; i++) {
+			var pair = parmsArray[i].split('=');
+			var val = decodeURIComponent(pair[1]);
+			if (val != '' && pair[0] != '') query_string[pair[0]] = val;
+		}
+		return query_string;
+	}();
+
+var clonedVideo = '';
+var gifPlayedStartTime ='';
+	
+	function setClickMacro(){
+		
+	
+		/*if(!document.getElementById('clickTag'))
+		{
+			var aTag = document.createElement('a');
+			aTag.href='http://www.google.com';
+			aTag.target='_blank';
+			aTag.id='clickTag';
+			
+			document.body.appendChild(aTag);
+			//aTag.appendChild(document.getElementById('canvas'));			
+		}*/
+
+		
+		if(document.getElementById('audio')){
+		document.getElementById('audio').onclick = function(){
+                	if(document.getElementById('mute').style.display=='none')
+                	{
+                        	document.getElementsByTagName('video')[0].muted = true; 
+                	}
+                	else
+                	{
+                        	document.getElementsByTagName('video')[0].muted = false;
+                	}
+        	}
+		}
+
+		if(document.getElementById('closeBtn')){
+		document.getElementById('closeBtn').addEventListener('click',function(){
+                	var win = parent.window;
+                	if (win == null || !window['postMessage']){}
+                	else
+                      	win.postMessage("hide", "*");
+        	});}
+		
+	
+		if(getUriParams.clickUrl!==undefined && getUriParams.clickUrl!='')
+		{
+			if(document.getElementById('clickTag'))
+			{
+				var clickTag = getUriParams.clickmacro + getUriParams.clickUrl;
+				document.getElementById('clickTag').setAttribute('href',clickTag);
+			}
+			
+			if(document.getElementsByClassName('clicktag').length>0)
+			{
+				var clicktags = document.getElementsByClassName('clicktag');
+				
+				for(i=0;i < clicktags.length;i++){
+					clicktags[i].setAttribute('href',getUriParams.clickmacro+clicktags[i].getAttribute('href'));
+				}
+			}
+		}
+		else if(getUriParams.clickmacro!==undefined && getUriParams.clickmacro!='')
+		{
+			if(document.getElementById('clickTag'))
+                        {
+				var clickTag = getUriParams.clickmacro + document.getElementById('clickTag').getAttribute('href');
+				document.getElementById('clickTag').setAttribute('href',clickTag);
+			}
+			
+			if(document.getElementsByClassName('clicktag').length>0)
+			{
+				var clicktags = document.getElementsByClassName('clicktag');
+				
+				for(i=0;i < clicktags.length;i++){
+					clicktags[i].setAttribute('href',getUriParams.clickmacro+clicktags[i].getAttribute('href'));
+				}
+			}
+		}
+		
+		if(document.getElementById('clickTag')){
+			document.getElementById('clickTag').addEventListener('click',function(){
+				var xmlhttp = new XMLHttpRequest();
+				xmlhttp.onreadystatechange = function() {};	
+				var params = 'refId='+getUriParams.refId;
+				params += '&lineId='+getUriParams.lId;
+				params += '&oId='+getUriParams.oId;
+				params += '&cId='+getUriParams.cId;
+				xmlhttp.open("POST", "https://adserve.2adpro.com/trackclicks", true);
+				xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+				xmlhttp.send(params);
+			});
+		}
+
+		if(document.getElementsByClassName('expand').length > 0)
+		{
+			/*document.getElementsByClassName('expand')[0].setAttribute('onclick','');
+			document.getElementsByClassName('expand')[0].addEventListener('click',function(){
+				var win = parent.window;
+	                	if (win == null || !window['postMessage']){}
+        	        	else
+                	   	win.postMessage("expand", "*");
+			});*/			
+		}
+
+		if(document.getElementsByClassName('close').length > 0)
+                {
+			document.getElementsByClassName('close')[0].setAttribute('onclick','');
+                        document.getElementsByClassName('close')[0].addEventListener('click',function(){
+                                var win = parent.window;
+                                if (win == null || !window['postMessage']){}
+                                else
+                                win.postMessage("collapse", "*");
+                        });                     
+                }
+                
+                
+
+		if(document.getElementsByTagName('video').length>0)
+		{
+			if(getUriParams.gifDisp=='1')
+			{
+				var videoGif = document.createElement('img');
+				videoGif.setAttribute('style', 'margin:0 auto; position:relative; z-index:99999; box-sizing: border-box; -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; height:100%; width:100%;');
+				videoGif.onload = function () {
+ 				  //gifPlayedStartTime = Date.now();
+					//console.log("gifPlayedStartTime="+gifPlayedStartTime);
+				}
+				videoGif.onclick=function(){
+					totalPlayedTime = (Date.now() - gifPlayedStartTime)/(3600);
+					document.getElementsByTagName('video')[0].style.display = '';
+					//parentElement.firstChild.setAttribute('onclick','');
+					this.style.display='none';						
+					document.getElementById('myVideo').style.display='block';
+					
+					var el = document.getElementsByClassName("vidClk");
+					//console.log(el);
+					//console.log(el[0].href);
+					console.log("gifPlayedTime="+gifPlayedStartTime+'=='+Date.now()+'=='+totalPlayedTime);
+					restartVideo(totalPlayedTime);
+					//window.location = el[0].href;	
+					window.open(el[0].href, '_blank');
+					
+					
+				}
+				videoGif_src=document.getElementsByTagName('source')[0].src;
+				videoGif_src = videoGif_src.replace('.mp4','.gif');
+				videoGif.setAttribute('src', videoGif_src+"?t="+Date.now());	
+				document.getElementsByTagName('video')[0].parentNode.insertBefore(videoGif,document.getElementsByTagName('video')[0]);
+				document.getElementsByTagName('video')[0].style.display='none';
+				gifPlayedStartTime = Date.now();
+				
+			}
+
+			document.getElementsByTagName('video')[0].src = document.getElementsByTagName('video')[0].getElementsByTagName('source')[0].src;
+
+			document.getElementsByTagName('video')[0].load();
+			document.getElementsByTagName('video')[0].muted=false;
+			document.getElementsByTagName('video')[0].setAttribute('class','video-js vjs-default-skin');
+
+			
+			var prevPlayed = 0;
+
+           	var myPlayer;
+           	var muted = true;	
+           		
+		
+			videojs(document.getElementsByTagName('video')[0],{'width':'100%','height':'100%'}).ready(function(){
+				myPlayer = this;
+				
+				myPlayer.muted(true);
+				document.getElementsByTagName('video')[0].setAttribute('id','myVideo');	
+				document.getElementsByTagName('video')[0].style.position = 'fixed !important';
+				document.getElementsByTagName('video')[0].parentNode.style.position = 'fixed !important';
+
+				if(document.getElementById('closeBtn'))
+					document.getElementById('closeBtn').style.zIndex = '999999';
+					
+				myPlayer.on("pause", function(event) {
+				
+					var xmlhttp = new XMLHttpRequest();
+                        xmlhttp.onreadystatechange = function() {};
+                    var params = 'refId='+getUriParams.refId;
+                        params += '&lineId='+getUriParams.lId;
+                        params += '&oId='+getUriParams.oId;
+                        params += '&cId='+getUriParams.cId;
+			    		params += '&event=PAUSED';
+                        xmlhttp.open("POST", "https://adserve.2adpro.com/trackuseractivity", true);
+                        xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                        xmlhttp.send(params);					
+				});
+				
+				myPlayer.on("play", function(event) {
+				
+					var xmlhttp = new XMLHttpRequest();
+                        xmlhttp.onreadystatechange = function() {};
+                    var params = 'refId='+getUriParams.refId;
+                        params += '&lineId='+getUriParams.lId;
+                        params += '&oId='+getUriParams.oId;
+                        params += '&cId='+getUriParams.cId;
+			    		params += '&event=PLAYED';
+                        xmlhttp.open("POST", "https://adserve.2adpro.com/trackuseractivity", true);
+                        xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                        xmlhttp.send(params);					
+				});
+					
+				myPlayer.on("volumechange", function(event) {
+					var isVolumeMuted = myPlayer.muted();
+					
+					if(isVolumeMuted && muted)
+					{
+						muted = true;
+						var xmlhttp = new XMLHttpRequest();
+                            xmlhttp.onreadystatechange = function() {};
+                        var params = 'refId='+getUriParams.refId;
+                            params += '&lineId='+getUriParams.lId;
+                            params += '&oId='+getUriParams.oId;
+                            params += '&cId='+getUriParams.cId;
+				    		params += '&event=MUTEDON';
+                            xmlhttp.open("POST", "https://adserve.2adpro.com/trackuseractivity", true);
+                            xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                            xmlhttp.send(params);
+					}
+					
+					else if(!isVolumeMuted && muted)
+					{
+						muted = false;
+						var xmlhttp = new XMLHttpRequest();
+                            xmlhttp.onreadystatechange = function() {};
+                        var params = 'refId='+getUriParams.refId;
+                            params += '&lineId='+getUriParams.lId;
+                            params += '&oId='+getUriParams.oId;
+                            params += '&cId='+getUriParams.cId;
+				    		params += '&event=MUTEDOFF';
+                            xmlhttp.open("POST", "https://adserve.2adpro.com/trackuseractivity", true);
+                            xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                            xmlhttp.send(params);
+					}
+				});
+
+				myPlayer.on("timeupdate", function(event) { //chrome fix
+					played = (((this.currentTime()/this.duration()))*100);
+
+					var duration = 0;
+					if(prevPlayed==75 && played<25)
+						duration = 100;
+					if(played>75 && played <=100)
+						duration = 75;
+					else if(played>50 && played <=75)
+						duration = 50;
+					else if(played>25 && played <=50)
+                                                duration = 25 ;
+
+					if(duration !=0 && duration!=prevPlayed)
+					{
+						prevPlayed = duration;
+						var xmlhttp = new XMLHttpRequest();
+                                                    xmlhttp.onreadystatechange = function() {};
+                                                var params = 'refId='+getUriParams.refId;
+                                                    params += '&lineId='+getUriParams.lId;
+                                                    params += '&oId='+getUriParams.oId;
+                                                    params += '&cId='+getUriParams.cId;
+						    params += '&dur='+duration;
+                                                    xmlhttp.open("POST", "https://adserve.2adpro.com/trackvideoplayed?dur"+duration, true);
+                                                    xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                                                    xmlhttp.send(params);
+					}
+            			});
+
+				myPlayer.on("ended", function(event) { //chrome fix
+                                        played = (((this.currentTime()/this.duration()))*100);
+
+                                        var duration = 100;
+
+                                                var xmlhttp = new XMLHttpRequest();
+                                                    xmlhttp.onreadystatechange = function() {};
+                                                var params = 'refId='+getUriParams.refId;
+                                                    params += '&lineId='+getUriParams.lId;
+                                                    params += '&oId='+getUriParams.oId;
+                                                    params += '&cId='+getUriParams.cId;
+                                                    params += '&dur='+duration;
+                                                    xmlhttp.open("POST", "https://adserve.2adpro.com/trackvideoplayed?dur"+duration, true);
+                                                    xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                                                    xmlhttp.send(params);
+                                });	
+			},'sync');
+			
+			
+		}
+		
+        //Begin Orientation change functions here
+        
+        function doOnOrientationChange()
+        {
+        	mPlayer.dispose();
+            
+            videojs(document.getElementsByTagName('video')[0],{'width':'100%','height':'100%'}).ready(function(){
+				
+				myPlayer = this;
+
+				myPlayer.muted(true);
+				document.getElementsByTagName('video')[0].setAttribute('id','myVideo');	
+				document.getElementsByTagName('video')[0].style.position = 'fixed !important';
+				document.getElementsByTagName('video')[0].parentNode.style.position = 'fixed !important';
+				
+				myPlayer.on("pause", function(event) {
+				
+					var xmlhttp = new XMLHttpRequest();
+                        xmlhttp.onreadystatechange = function() {};
+                    var params = 'refId='+getUriParams.refId;
+                        params += '&lineId='+getUriParams.lId;
+                        params += '&oId='+getUriParams.oId;
+                        params += '&cId='+getUriParams.cId;
+			    		params += '&event=PAUSED';
+                        xmlhttp.open("POST", "https://adserve.2adpro.com/trackuseractivity", true);
+                        xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                        xmlhttp.send(params);					
+				});
+				
+				myPlayer.on("play", function(event) {
+				
+					var xmlhttp = new XMLHttpRequest();
+                        xmlhttp.onreadystatechange = function() {};
+                    var params = 'refId='+getUriParams.refId;
+                        params += '&lineId='+getUriParams.lId;
+                        params += '&oId='+getUriParams.oId;
+                        params += '&cId='+getUriParams.cId;
+			    		params += '&event=PLAYED';
+                        xmlhttp.open("POST", "https://adserve.2adpro.com/trackuseractivity", true);
+                        xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                        xmlhttp.send(params);					
+				});
+
+				myPlayer.on("volumechange", function(event) {
+					var isVolumeMuted = myPlayer.muted();
+					
+					if(isVolumeMuted && muted)
+					{
+						muted = true;
+						var xmlhttp = new XMLHttpRequest();
+                            xmlhttp.onreadystatechange = function() {};
+                        var params = 'refId='+getUriParams.refId;
+                            params += '&lineId='+getUriParams.lId;
+                            params += '&oId='+getUriParams.oId;
+                            params += '&cId='+getUriParams.cId;
+				    		params += '&event=MUTED';
+                            xmlhttp.open("POST", "https://adserve.2adpro.com/trackuseractivity", true);
+                            xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                            xmlhttp.send(params);
+					}
+					
+					else if(!isVolumeMuted && muted)
+					{
+						muted = false;
+						var xmlhttp = new XMLHttpRequest();
+                            xmlhttp.onreadystatechange = function() {};
+                        var params = 'refId='+getUriParams.refId;
+                            params += '&lineId='+getUriParams.lId;
+                            params += '&oId='+getUriParams.oId;
+                            params += '&cId='+getUriParams.cId;
+				    		params += '&event=MUTEOFF';
+                            xmlhttp.open("POST", "https://adserve.2adpro.com/trackuseractivity", true);
+                            xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                            xmlhttp.send(params);
+					}
+				});
+				
+				myPlayer.on("timeupdate", function(event) { //chrome fix
+					played = (((this.currentTime()/this.duration()))*100);
+
+					var duration = 0;
+					if(prevPlayed==75 && played<25)
+						duration = 100;
+					if(played>75 && played <=100)
+						duration = 75;
+					else if(played>50 && played <=75)
+						duration = 50;
+					else if(played>25 && played <=50)
+                                                duration = 25 ;
+
+					if(duration !=0 && duration!=prevPlayed)
+					{
+						prevPlayed = duration;
+						var xmlhttp = new XMLHttpRequest();
+                            xmlhttp.onreadystatechange = function() {};
+                        var params = 'refId='+getUriParams.refId;
+                            params += '&lineId='+getUriParams.lId;
+                            params += '&oId='+getUriParams.oId;
+                            params += '&cId='+getUriParams.cId;
+				    		params += '&dur='+duration;
+                            xmlhttp.open("POST", "https://adserve.2adpro.com/trackvideoplayed?dur"+duration, true);
+                            xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                            xmlhttp.send(params);
+					}
+         		});
+
+
+				myPlayer.on("ended", function(event) { //chrome fix
+                                        played = (((this.currentTime()/this.duration()))*100);
+
+                                        var duration = 100;
+
+                                                var xmlhttp = new XMLHttpRequest();
+                                                    xmlhttp.onreadystatechange = function() {};
+                                                var params = 'refId='+getUriParams.refId;
+                                                    params += '&lineId='+getUriParams.lId;
+                                                    params += '&oId='+getUriParams.oId;
+                                                    params += '&cId='+getUriParams.cId;
+                                                    params += '&dur='+duration;
+                                                    xmlhttp.open("POST", "https://adserve.2adpro.com/trackvideoplayed?dur"+duration, true);
+                                                    xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                                                    xmlhttp.send(params);
+                                });
+			},'sync');
+        }
+        
+        window.addEventListener('orientationchange', doOnOrientationChange);
+        
+	}	
+	
+	window.addEventListener('load', setClickMacro);
+
+	window.VIDEOJS_NO_BASE_THEME = false;
+	document.VIDEOJS_NO_BASE_THEME = false;
+	var link = document.createElement('link');
+	link.href = "https://adserve.2adpro.com/js/video-js.css";
+	link.setAttribute('rel',"stylesheet");
+	document.getElementsByTagName('head')[0].appendChild(link);
+
+	window.VIDEOJS_NO_BASE_THEME = false;
+
+	var videojs = document.createElement('script');
+            videojs.src = "https://adserve.2adpro.com/js/video.js";
+            document.getElementsByTagName('head')[0].appendChild(videojs);   
+            
+	
+	function startVideo(){
+		if(document.getElementsByTagName('canvas').length >0)
+		{
+			var canvas = document.getElementsByTagName('canvas')[0];
+		        var context = canvas.getContext('2d');
+			//context.clearRect(0,0,canvas.width,canvas.height);
+		}
+
+		if(document.getElementsByTagName('video').length>0)
+		{
+ 			document.getElementsByTagName('video')[0].play();
+		}
+
+		if(document.getElementById('mute'))
+        {
+               // document.getElementById('mute').style.display = 'block';
+               // document.getElementById('unmute').style.display = 'none';
+        }
+	}
+
+	function restartVideo(seekTime){
+		document.getElementsByTagName('video')[0].load();
+                document.getElementsByTagName('video')[0].play();
+		if(seekTime!==undefined)
+		{
+			document.getElementsByTagName('video')[0].currentTime = seekTime;
+		}
+                //document.getElementsByTagName('video')[0].muted=false;
+
+                if(document.getElementById('mute'))
+                {
+                       // document.getElementById('mute').style.display = 'block';
+                       // document.getElementById('unmute').style.display = 'none';
+                }
+        }
+
+	function stopVideo(){
+        	document.getElementsByTagName('video')[0].pause();
+		document.getElementsByTagName('video')[0].muted=true;
+
+		if(document.getElementById('mute'))
+		{
+			document.getElementById('mute').style.display = 'none';
+			document.getElementById('unmute').style.display = 'block';
+		}
+	}
+
+	function hideCreative()
+	{
+		var win = parent.window;
+        if (win == null || !window['postMessage']){}
+        else
+           win.postMessage("hide", "*");
+           
+        var xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function() {};
+        var params = 'refId='+getUriParams.refId;
+            params += '&lineId='+getUriParams.lId;
+            params += '&oId='+getUriParams.oId;
+            params += '&cId='+getUriParams.cId;
+			params += '&event=HIDE';
+            xmlhttp.open("POST", "https://adserve.2adpro.com/trackuseractivity", true);
+            xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xmlhttp.send(params);
+	}
+
+	function displayCreative()
+    {
+        var win = parent.window;
+        if (win == null || !window['postMessage']){}
+        else
+           win.postMessage("show", "*");
+           
+        var xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function() {};
+        var params = 'refId='+getUriParams.refId;
+            params += '&lineId='+getUriParams.lId;
+            params += '&oId='+getUriParams.oId;
+            params += '&cId='+getUriParams.cId;
+			params += '&event=SHOW';
+            xmlhttp.open("POST", "https://adserve.2adpro.com/trackuseractivity", true);
+            xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xmlhttp.send(params);
+    }
+
+	function triggerClickTrack(clickUrl){
+			var xmlhttp = new XMLHttpRequest();
+		    xmlhttp.onreadystatechange = function() {};	
+		    var params = 'refId='+getUriParams.refId;
+		    params += '&lineId='+getUriParams.lId;
+		    params += '&oId='+getUriParams.oId;
+		    params += '&cId='+getUriParams.cId;
+		    xmlhttp.open("POST", "https://adserve.2adpro.com/trackclicks", true);
+		    xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+		    xmlhttp.send(params);
+			
+			if(getUriParams.clickmacro!==undefined)
+				window.open(getUriParams.clickmacro+clickUrl);
+			else
+				window.open(clickUrl);
+		}
+		
+	function postWinMessage(message)
+	{
+		var win = parent.window;
+                if (win == null || !window['postMessage']){}
+                else
+                   win.postMessage(message, "*");
+	}
+
+	function ReceiveMessage(evt) {
+	  if(evt.data == 'start')
+        	startVideo();
+	  else if(evt.data == 'stop')
+        	stopVideo();
+	  else if(evt.data == 'restart')
+                restartVideo();
+          else if(evt.data == 'init')
+                restartVideo();
+	 } // End Function ReceiveMessage
+
+
+ 	if (!window['postMessage'])
+	{ }
+	 else {
+   		if (window.addEventListener) {
+		    // For standards-compliant web browsers (ie9+)
+		    window.addEventListener("message", ReceiveMessage, false);
+ 		}
+		else {
+		    //alert("not standards-compliant (ie8)");
+		    window.attachEvent("onmessage", ReceiveMessage);
+		 }
+	}
+	
+ function resizeCanvas(width, height) { 	
+	document.getElementsByTagName('canvas')[0].width = width;
+	document.getElementsByTagName('canvas')[0].height = height;
+ }
+
+	
+	
+
+

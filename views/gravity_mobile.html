@@ -1,0 +1,479 @@
+if(!parent.document.getElementById('frame_{{refId}}'))
+{
+
+var jsElm = document.createElement('script');
+	jsElm.type = "application/javascript";
+    jsElm.src = 'https://adserve.2adpro.com/js/viewability.js';
+    
+parent.document.body.appendChild(jsElm);
+
+function setCookie(cname, cvalue, exdays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays*24*60*60*1000));
+    var expires = "expires="+ d.toUTCString();
+    document.cookie = cname + "=" + cvalue + "; " + expires;
+}
+
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length,c.length);
+        }
+    }
+    return "";
+}
+
+
+function insertAfter(referenceNode, newNode) {
+    referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
+}
+
+var freqCapCnt = getCookie('{{refId}}');
+var displayVideo = '';
+var displaySliveAd = 'none';
+var setFreqCapCnt = 2;
+var displayGif = 0;
+
+if(freqCapCnt!='')
+	freqCapCnt = parseInt(freqCapCnt);
+
+if(freqCapCnt=='' || freqCapCnt==NaN)
+{
+  displayVideo = '';
+  displaySliveAd = 'none';
+  displayGif='1';
+  freqCapCnt = 1;
+}
+else if(freqCapCnt >= setFreqCapCnt)
+{
+ freqCapCnt++;
+ displayVideo='none';
+ displaySliveAd = '';
+}
+else
+{
+ freqCapCnt++;
+}
+
+iframe = document.createElement('iframe');
+iframe.id = 'frame_{{refId}}';
+iframe.src = "{{creativeUrl}}?refId={{refId}}&clickmacro={{clickmacro}}&lId={{lId}}&cId={{cId}}&oId={{oId}}&gifDisp="+displayGif;
+iframe.setAttribute('style','border:none;width:100%;height:100%;display:;');
+iframe.setAttribute('scrolling','no');
+iframe.setAttribute('allowfullscreen',"true");
+iframe.setAttribute('webkitallowfullscreen',"true");
+iframe.setAttribute('mozallowfullscreen',"true");
+
+clicktoshow = document.createElement('div');
+clicktoshow.setAttribute('id','clicktoshow');
+clicktoshow.innerHTML = '<img src="http://jdvault.2adpro.com/creatives/fiat/VIEW-VIDEO_Button.png" style="width:220px;cursor:pointer;" width="220px">';clicktoshow.setAttribute('style','position:absolute;top:160px;left:50%;margin-left:-110px;z-index:5;display:none');
+
+var ht = (parent.window.innerHeight)+'px';
+section = document.createElement('section');
+section.appendChild(iframe);
+section.appendChild(clicktoshow);
+section.id='creative_disp';
+section.setAttribute('style','width: 100%; height:210px; z-index:1; position:relative;left:0px;opacity:1;');
+section.style.display=displayVideo;
+//parent.document.getElementById('main').insertBefore(section,parent.document.getElementById('main-content'));
+parent.document.getElementsByClassName('contents')[0].insertBefore(section,parent.document.getElementById('main'));
+parent.document.getElementsByClassName('container')[0].setAttribute('style','margin-top:0px');
+parent.document.getElementsByClassName('journal-content-article')[0].setAttribute('style','display:none');
+
+//var targetelement = document.getElementsByClassName('nav-wrap');
+//insertAfter(targetelement, section);
+
+var w = parent.window.innerWidth
+|| parent.document.documentElement.clientWidth
+|| parent.document.body.clientWidth;
+
+l = parseInt(w/2);
+
+closeButton = document.createElement('div');
+closeButton.setAttribute('id','closeBtn');
+//closeButton.innerHTML='<img id="hideBtn" src="https://adserve.2adpro.com/images/get_thenews.png">';
+
+hideBtn = document.createElement('img');
+hideBtn.src= "https://adserve.2adpro.com/images/get_thenews.png";
+closeButton.appendChild(hideBtn);
+closeButton.setAttribute('style','position: absolute;top:150px;right:0px;left:0px;width:100px;margin:auto;cursor:pointer;z-index:121300000');
+//section.appendChild(closeButton);
+
+slivebck = document.createElement('div');
+slivebck.setAttribute('id','sliverbackgnd');
+//slivebck.setAttribute('style','width:100%;display:block;left:0px;top:5px;clear:both;text-align:center;position:absolute;z-index:10');
+slivebck.setAttribute('style','width:100%;display:block;left:0px;top:10px;clear:both;text-align:center;position:relative;z-index:10; height:69px;');
+
+slivead = document.createElement('img');
+slivead.id='sliveimg';
+slivead.src='{{sliverImage}}';
+slivead.setAttribute('style','cursor:pointer;');
+slivebck.style.display=displaySliveAd;
+slivebck.appendChild(slivead);
+
+parent.document.getElementById('main').insertBefore(slivebck, parent.document.getElementById('main-content'));
+
+parent.document.getElementById('main-content').style.position = 'relative';
+parent.document.getElementById('main-content').style.zIndex = 0;
+parent.document.getElementById('main-content').style.opacity = 1;
+
+//parent.document.getElementById('main').firstChild.style.display='none';
+
+if(displayVideo=='')
+{
+        //parent.document.getElementsByClassName('site-nav')[0].className = 'site-nav is_stuck';
+        //parent.document.getElementsByClassName('site-masthead')[0].setAttribute('style','margin-top:-80px');
+}
+else
+{
+	parent.document.getElementById('sliveimg').scrollIntoView(false);		
+}
+
+
+setCookie('{{refId}}',freqCapCnt,freqCapCnt);
+
+slivead.onclick = function(){
+        showHideCreative('show');
+}
+
+hideBtn.onclick = function(){
+	showHideCreative('hide');
+}
+
+function showHideCreative(action){
+        if(action=='show')
+        {
+			var xmlhttp = new XMLHttpRequest();
+			    xmlhttp.onreadystatechange = function() {};	
+			    var params = 'refId={{refId}}';
+			    params += '&lineId={{lId}}';
+			    params += '&oId={{oId}}';
+			    params += '&cId={{cId}}';
+			    params += '&event=SHOW';
+	            xmlhttp.open("POST", "https://adserve.2adpro.com/trackuseractivity", true);
+	            xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	            xmlhttp.send(params);
+		
+                parent.document.getElementById('creative_disp').style.display='';
+                //parent.document.getElementById('sliveimg').style.display='none';
+		parent.document.getElementById('sliverbackgnd').style.display='none';
+		//parent.document.getElementById('main-content').style.position='relative';
+		//parent.document.getElementsByClassName('site-nav')[0].className = 'site-nav is_stuck';
+		//parent.document.getElementById('main-content').style.top = 141+'px';
+		//parent.document.getElementsByClassName('site-masthead')[0].setAttribute('style','margin-top:-80px');		
+               	scrollContent2('show'); 
+        }
+        else if(action=='hide')
+        {
+			var xmlhttp = new XMLHttpRequest();
+			    xmlhttp.onreadystatechange = function() {};	
+			    var params = 'refId={{refId}}';
+			    params += '&lineId={{lId}}';
+			    params += '&oId={{oId}}';
+			    params += '&cId={{cId}}';
+			    params += '&event=HIDE';
+	            xmlhttp.open("POST", "https://adserve.2adpro.com/trackuseractivity", true);
+	            xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	            xmlhttp.send(params);
+		
+                parent.document.getElementById('sliverbackgnd').style.display='none';
+		parent.document.getElementById('main-content').style.display = '';
+                parent.document.getElementById('main-content').style.position='relative';
+		//parent.document.getElementsByClassName('site-nav')[0].className = 'site-nav';
+                //parent.document.getElementsByClassName('site-nav')[0].removeAttribute('style');
+                //parent.document.getElementsByClassName('site-masthead')[0].removeAttribute('style');
+		//parent.document.body.scrollTop = 80 + 'px';
+		parent.document.getElementById('main-content').scrollIntoView(true);
+		//scrollContent2('hide');
+
+		parent.document.getElementById('main-content').scrollTop = 80+'px';
+		parent.document.getElementById('creative_disp').style.opacity = 0;
+
+                        var win = parent.document.getElementById('frame_{{refId}}').contentWindow;
+                                        if (win == null || !window['postMessage']){}
+                                        else
+                                                win.postMessage("stop", "*");
+        }
+};
+
+var tp;
+
+function scrollContent2(showHide){
+        el = parent.document.getElementById('main-content');
+	el.style.opacity=1;
+
+        var st = window.pageYOffset || parent.document.documentElement.scrollTop;
+
+	tp = el.style.top;
+
+	tp = tp.substr(0,tp.lastIndexOf('px'));
+
+	de = parent.document.documentElement.scrollTop || parent.document.body.scrollTop
+
+
+        if(showHide == 'hide'){
+                (function fade1() {
+			//parent.document.body.scrollTop = 80 + 'px';
+			el = parent.document.getElementById('main-content');
+                        tp = 40;
+                        parent.document.getElementById('creative_disp').style.opacity = 0;          
+			lastScrollTop = 0;
+
+			var win = parent.document.getElementById('frame_{{refId}}').contentWindow;
+                                        if (win == null || !window['postMessage']){}
+                                        else
+                                                win.postMessage("stop", "*");
+                         
+                })();
+        }
+	else{
+		(function fade1() {
+                        el = parent.document.getElementById('main-content');
+                        tp = parent.window.innerHeight+40;
+			//el.style.display='none';
+                        parent.document.getElementById('creative_disp').style.opacity = 1;
+			//lastScrollTop = parent.window.innerHeight;
+
+				var win = parent.document.getElementById('frame_{{refId}}').contentWindow;
+                                        if (win == null || !window['postMessage']){}
+                                        else
+                                                win.postMessage("start", "*");
+	
+			parent.document.documentElement.scrollTop = 80+'px';
+			parent.document.body.scrollTop = 80 + 'px';
+                })();
+		parent.document.onscroll = scrollContent;
+	}
+}
+
+var dir = 0;
+
+var lastScrollTop = 750;
+
+if(displayVideo=='none')
+{
+	lastScrollTop = 0;
+}
+
+function scrollContent(){
+	el = parent.document.getElementById('main-content');
+	el.style.opacity = 1;
+	parent.document.getElementById('main-content').style.display = '';
+        parent.document.getElementById('main-content').style.position='relative';
+
+	var st = parent.document.documentElement.scrollTop || parent.document.body.scrollTop || parent.window.offsetY;
+
+   	if (st > lastScrollTop && st > 0){
+ 		(function fade1() {
+   			var  tp = (st>parent.window.innerHeight)?(st+40):(st+40);
+
+			/*if (st > parent.window.innerHeight+40) {				
+			      
+    			} else {*/
+				el.style.zIndex = '10';
+				el.style.position = 'relative';
+				el.style.transition ='0.5s linear';
+			if(parent.document.getElementById('creative_disp').style.opacity > 0 && parent.document.getElementById('creative_disp').style.display=='' ){	
+				/*if(parent.document.getElementById('creative_disp').style.opacity == 0.8)
+					parent.document.getElementById('creative_disp').style.opacity = 0.7;
+				else if(parent.document.getElementById('creative_disp').style.opacity == 0.4)
+                                        parent.document.getElementById('creative_disp').style.opacity = 0.3;
+				else if(parent.document.getElementById('creative_disp').style.opacity == 0.3)
+                                        parent.document.getElementById('creative_disp').style.opacity = 0.2;
+				 else if(parent.document.getElementById('creative_disp').style.opacity == 0.2)
+                                        parent.document.getElementById('creative_disp').style.opacity = 0.1;
+				else if(parent.document.getElementById('creative_disp').style.opacity >= 0)
+					parent.document.getElementById('creative_disp').style.opacity = parseFloat(parent.document.getElementById('creative_disp').style.opacity)-0.1;		*/
+
+			elRect = el.getBoundingClientRect();
+			if(parent.document.getElementById('creative_disp').style.opacity > 0 && parent.document.getElementById('creative_disp').style.display=='' && elRect.top<parent.window.innerHeight) {
+				parent.document.getElementById('creative_disp').style.opacity = ((elRect.top)/250)*1;
+		}
+
+				if(st>parseInt(parent.window.innerHeight))
+				{
+					//parent.document.getElementById('creative_disp').style.opacity = 0;
+				}
+
+				if(parent.document.getElementById('creative_disp').style.opacity<=0.12){
+					parent.document.getElementById('creative_disp').style.opacity = 0;
+					var win = parent.document.getElementById('frame_{{refId}}').contentWindow;
+                                        if (win == null || !window['postMessage']){}
+                                        else
+                                                win.postMessage("stop", "*");
+				}
+
+    			}
+  		})();      	
+   	} else {
+
+		(function fade2() {
+                        var  tp = st+40;
+
+			var ua = navigator.userAgent.toLowerCase(); 
+			if (ua.indexOf('safari') != -1) { 
+			  if (ua.indexOf('chrome') > -1) {
+    				
+  				} else {
+    				//tp = parent.document.body.clientHeight-st;
+  				}
+			}
+
+			wH = parent.window.innerHeight;
+
+			tp = (st>wH)?(st+40):(st+40);
+
+                                el.style.zIndex = '0';
+                                //el.style.top = st+'px';
+				el.style.position = 'relative';
+				el.style.transition ='0.5s linear';
+				//parent.document.getElementById('creative_disp').style.position = 'absolute';
+				//parent.document.getElementById('creative_disp').style.bottom = '-85px';
+				parent.document.getElementsByClassName('container')[0].setAttribute('style','margin-top:0px');
+				if(parent.document.getElementById('creative_disp').style.opacity < 1 && parent.document.getElementById('creative_disp').style.display=='' && st<wH){
+					/*if(parent.document.getElementById('creative_disp').style.opacity == 0.7)
+                                        parent.document.getElementById('creative_disp').style.opacity = 0.8;
+                                else if(parent.document.getElementById('creative_disp').style.opacity == 0.8)
+                                        parent.document.getElementById('creative_disp').style.opacity = 0.9;
+				else if(parent.document.getElementById('creative_disp').style.opacity == 0.9)
+                                        parent.document.getElementById('creative_disp').style.opacity = 1;
+                                else if(parent.document.getElementById('creative_disp').style.opacity == 0.2)
+                                        parent.document.getElementById('creative_disp').style.opacity = 0.3;
+				else if(parent.document.getElementById('creative_disp').style.opacity == 0.3)
+                                        parent.document.getElementById('creative_disp').style.opacity = 0.4;
+				else if(parent.document.getElementById('creative_disp').style.opacity == 0.4)
+                                        parent.document.getElementById('creative_disp').style.opacity = 0.5;
+				else if(parent.document.getElementById('creative_disp').style.opacity == 0.5)
+                                        parent.document.getElementById('creative_disp').style.opacity = 0.6;
+				else if(parent.document.getElementById('creative_disp').style.opacity == 0.6)
+                                        parent.document.getElementById('creative_disp').style.opacity = 0.7;
+                                 else if(parent.document.getElementById('creative_disp').style.opacity == 0.1)
+                                        parent.document.getElementById('creative_disp').style.opacity = 0.2;			 
+				else			
+						parent.document.getElementById('creative_disp').style.opacity = parseFloat(parent.document.getElementById('creative_disp').style.opacity)+0.1;*/
+				}
+				else
+				{
+					
+				}
+
+				elRect = el.getBoundingClientRect();
+
+				parent.document.getElementById('creative_disp').style.opacity = (elRect.top/250)/1;		
+
+
+				if(parent.document.getElementById('creative_disp').style.opacity>0.6)
+					parent.document.getElementById('creative_disp').style.opacity = 1;
+
+				if(parent.document.getElementById('creative_disp').style.opacity>0.1){
+                                        //parent.document.getElementById('creative_disp').style.opacity = 1;
+                                        var win = parent.document.getElementById('frame_{{refId}}').contentWindow;
+                                        if (win == null || !window['postMessage']){}
+                                        else
+                                                win.postMessage("start", "*");
+                                }
+                })();		
+      
+   	}
+   	lastScrollTop = st;
+}
+
+//parent.document.getElementById('creative_disp').style.position = 'absolute';
+//parent.document.getElementById('creative_disp').style.bottom = '-85px';
+parent.document.getElementsByClassName('container')[0].setAttribute('style','margin-top:0px');	
+
+if(displayVideo==''){
+
+	//parent.document.getElementById('main-content').style.top = '92px';
+	//parent.document.documentElement.scrollTop = '228';
+
+	parent.window.setTimeout(function(){parent.document.onscroll = scrollContent;},5000);
+}
+
+//	parent.document.onscroll = scrollContent;
+
+var threshold = 0.5
+var elapsedTime = 0
+var startOfElapsedTime = -1 // -1 means not started
+var tracked = 0;
+	
+function calculate(el) {
+	var v = parent.viewability.vertical(el)
+	var h = parent.viewability.horizontal(el)
+	var combined = h.value * v.value
+	if (combined > threshold) {
+		if (elapsedTime === 0 && startOfElapsedTime === -1) {
+			startOfElapsedTime = Date.now()
+		}
+		elapsedTime = Date.now() - startOfElapsedTime
+	} else {
+		elapsedTime = 0;
+		startOfElapsedTime = -1 // resets to non-started position
+	}
+	
+	if(elapsedTime>1000 && tracked==0)
+	{
+		tracked = 1;
+		var xmlhttp = new XMLHttpRequest();
+	    xmlhttp.onreadystatechange = function() {};	
+	    var params = 'refId={{refId}}';
+	    params += '&lineId={{lId}}';
+	    params += '&oId={{oId}}';
+	    params += '&cId={{cId}}';
+	    xmlhttp.open("POST", "https://adserve.2adpro.com/trackview", true);
+	    xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	    xmlhttp.send(params);
+	}
+   if(elapsedTime>1000 && tracked==0)
+	{
+		tracked = 1;
+		var xmlhttp = new XMLHttpRequest();
+	    xmlhttp.onreadystatechange = function() {};	
+	    var params = 'refId={{refId}}';
+	    params += '&lineId={{lId}}';
+	    params += '&oId={{oId}}';
+	    params += '&cId={{cId}}';
+	     params += '&event=VIEWED';
+	    xmlhttp.open("POST", "https://adserve.2adpro.com/trackuseractivity", true);
+	    xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	    xmlhttp.send(params);
+	}
+}
+
+	function ReceiveMessageAdserve(evt) {
+          if(evt.data == 'show')
+                showHideCreative('show');
+          else if(evt.data == 'hide')
+                showHideCreative('hide');
+         } // End Function ReceiveMessage
+
+
+        if (!parent.window['postMessage'])
+        { }
+         else {
+                if (parent.window.addEventListener) {
+                    // For standards-compliant web browsers (ie9+)
+                    parent.window.addEventListener("message", ReceiveMessageAdserve, false);
+                }
+                else {
+                    //alert("not standards-compliant (ie8)");
+                    parent.window.attachEvent("onmessage", ReceiveMessageAdserve);
+                 }
+        }
+
+parent.window.setTimeout(function(){parent.window.setInterval(function() {
+	calculate(parent.document.getElementById('sliveimg'))
+}, 89);},10000);
+
+}
+else
+{
+        parent.document.getElementById(window.frameElement.id).style.display='none';
+        //parent.document.getElementById(window.frameElement.id).parentNode.parentNode.parentNode.style.display='none';
+}
